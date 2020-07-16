@@ -1,0 +1,58 @@
+/* CSS variables */
+:root {
+    
+    /* Colors */
+    --color--foreground: black;
+    --color--background: white;
+    --color--accent: #5171A5;
+
+    /* Fonts */
+    --font--primary: "Arial", sans-serif;
+
+}
+
+/* Body */
+body {
+    margin: 5px;
+    color: var(--color--foreground);
+    background-color: var(--color--background);
+    font-family: var(--font--primary);
+}
+
+::selection {
+    color: var(--color--background);
+    background-color: var(--color--accent);
+}
+
+/* Navbar */
+.navbar {
+    padding: 5px;
+}
+
+.navbar--link {
+    color: var(--color--accent);
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.navbar--link:hover {
+    color: var(--color--background);
+    background-color: var(--color--accent)
+}
+
+/* Page content */
+.page-content {
+    margin: 10px;
+    line-height: 1.4;
+}
+
+.page-content a {
+    border-radius: 4px;
+    padding: 4px;
+    color: var(--color--accent);
+}
+
+.page-content a:hover {
+    color: var(--color--background);
+    background-color: var(--color--accent);
+}
