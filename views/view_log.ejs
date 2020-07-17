@@ -1,0 +1,15 @@
+<h2><%= appName %>: view logs</h2>
+<div class="view-log--controls">
+    <a href="javascript:location.reload()">Refresh</a>
+    <a href="javascript:exportFile()">Export file</a>
+</div>
+
+<div class="log-container">
+    <code class="log-content"></code>
+</div>
+
+<script defer src="/js/view_log.js"></script>
+
+<div class="hidden-meta">
+    <span class="appName"><%= appName %></span>
+</div>

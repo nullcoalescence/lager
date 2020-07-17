@@ -5,15 +5,18 @@
     --color--foreground: black;
     --color--background: white;
     --color--accent: #5171A5;
+    --color--log-background: #bbc2c4;
 
     /* Fonts */
     --font--primary: "Arial", sans-serif;
+    --font--mono: "Menlo", "Consolas", "Courier New", monospace;
 
 }
 
 /* Body */
 body {
     margin: 5px;
+    line-height: 1.4;
     color: var(--color--foreground);
     background-color: var(--color--background);
     font-family: var(--font--primary);
@@ -55,4 +58,35 @@ body {
 .page-content a:hover {
     color: var(--color--background);
     background-color: var(--color--accent);
+}
+
+.page-content code {
+    padding: 3px;
+    background-color: var(--color--log-background);
+    font-family: var(--font--mono);
+}
+
+/*
+*   View log page 
+*/
+.view-log--controls {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+/* Log display */
+.log-container {
+    padding: 10px;
+    font-family: var(--font--mono);
+    font-size: 90%;
+    background-color: var(--color--log-background);
+}
+
+/*
+*   .hidden-meta
+*   For transferring data between node code, ejs templates, and static
+*   @todo - probably a better way to do this
+*/
+.hidden-meta {
+    display: none;
 }
