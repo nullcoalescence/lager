@@ -6,7 +6,30 @@
 <p>
     <ul>
         <li><a href="/auth/register">Register your app</a></li>
-        <li><a href="/auth/list">View currently registered apps</a></li>
+        <li><a href="/auth/app-list">View currently registered apps and their corresponding api keys</a></li>
         <li><a href="/auth/revoke">Revoke access to an app</a></li>
     </ul>
+    <ul>
+        <li>
+            <a href="javascript:toggleConfirm()">Wipe database</a>
+            <ul>
+                <li id="wipe-database-confirmation">Wipe database? <a href="/auth/wipe-database">Yes</a><a href="javascript:toggleConfirm()">No</a></li>
+            </ul>
+        </li>
+    </ul>
+
+    <script>
+        var confirmOpen = false;
+        function toggleConfirm() {
+            if (confirmOpen) {
+                $("#wipe-database-confirmation").hide();
+                confirmOpen = false;
+            } else {
+                $("#wipe-database-confirmation").show();
+                confirmOpen = true;
+            }
+        }
+
+    </script>
+
 </p>

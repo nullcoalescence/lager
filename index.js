@@ -7,6 +7,7 @@
 *   Config
 */
 var path = require("path");
+var fs = require("fs");
 
 require("dotenv").config();
 
@@ -21,14 +22,20 @@ app.set("view engine", "ejs");
 app.use(expressPartials());
 app.use(express.static(path.join(__dirname, "/views/")));
 
-var port = process.env.port;
+var port = process.env.port || 4000;
 
+// Middleware
 var expressSanitizer = require("express-sanitizer");
 app.use(expressSanitizer());
+
+var { check, validationResult } = require("express-validator");
+var bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Logger (for this program itself)
 var winston = require("winston");
 const { format } = require("path");
+const { addColors } = require("winston/lib/winston/config");
 var logger = winston.createLogger({
     format: winston.format.simple(),
     transports: [
@@ -39,6 +46,12 @@ var logger = winston.createLogger({
 if (process.env.environment == "dev") {
     logger.add(new winston.transports.Console({ format: winston.format.simple() }));
 }
+
+// Database
+var appDatabase = require(path.join(__dirname, "/database.js"));
+
+// Directories
+var logDir = process.env.logDir || path.join(__dirname, "/logs/");
 
 /*
 *   Routing
@@ -64,7 +77,52 @@ app.get("/auth/", (req, res) => {
 });
 
 app.get("/auth/register", (req, res) => {
-    res.render(path.join(__dirname, "/views/auth_register.ejs"));
+        res.render(path.join(__dirname, "/views/auth_register.ejs"));
+});
+
+app.post("/auth/register/validate", 
+    check("appName").not().isEmpty().trim().escape().withMessage("'App name' field empty"),
+    (req, res) => {
+        var appName = req.body.appName;
+        var errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.render(path.join(__dirname, "/views/auth_register_error.ejs"), { errors: "Field 'App name' empty" });
+        } else {
+            appDatabase.addApp(req.body.appName);
+            var newApp = appDatabase.getApp(req.body.appName);
+
+            // Create log file
+            var logFileName = logDir + "/" + newApp.app_name + ".log.txt";
+
+            var fStream = fs.createWriteStream(logFileName);
+            fStream.write("[lager]: initialized app and created log!");
+            fStream.end();
+
+            res.render(path.join(__dirname, "/views/auth_add_app_success.ejs"), { app_name: newApp.app_name, api_key: newApp.api_key });
+    }
+});
+
+// GET /auth/app-list
+// Returns a JSON list of all registered apps
+app.get("/auth/app-list", (req, res) => {
+    var appList = appDatabase.getAppList();
+    for (var i = 0; i < appList.length; i++) {
+        res.render(path.join(__dirname, "/views/_partials/app_list.ejs"), { app_list: appList });
+    }
+});
+
+//  GET /auth/app
+// Returns a JSON object of the requested app
+app.get("/auth/app/:appName", (req, res) => {
+    var app = appDatabase.getApp(req.params.appName);
+    res.render(path.join(__dirname, "/views/_partials/app.ejs"), { app: app, app_name: app.app_name, api_key: app.api_key });
+});
+
+// GET /auth/wipe-db
+// Wipes database
+app.get("/auth/wipe-database", (req, res) => {
+    appDatabase.wipeDatabase();
+    res.render(path.join(__dirname, "/views/database_wiped.ejs"));
 });
 
 // POST /apps/:appname/write-log
@@ -84,10 +142,10 @@ app.post("/apps/:appName/write-log/", (req, res) => {
     
     var formattedLogEntry = "[" + appName + "]: " + logText;
     
-    //console.log(formattedLogEntry);
-    //res.send(formattedLogEntry);
+    // Open log
+    fs.writeFileSync(logDir + "/" + appName + ".log.txt");
 
-    logger.info(formattedLogEntry);
+    
     res.end();
 
 });
@@ -103,7 +161,8 @@ app.get("/apps/:appName/view-log", (req, res) => {
 // Returns actual log file
 // Used to export logs for user and for jQuery get() requests in view_log.js
 app.get("/apps/:appName/get-log", (req, res) => {
-    res.sendFile(path.join(__dirname, "/lager-log.txt"));
+    res.sendFile(logDir + "/" + req.params.appName + ".log.txt");
+    res.sendFile(logDir + req.params.appName + ".log.txt");
 });
 
 /*

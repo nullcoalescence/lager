@@ -67,6 +67,13 @@ body {
 }
 
 /*
+*   UI componenents
+*/
+#wipe-database-confirmation {
+    display: none;
+}
+
+/*
 *   View log page 
 */
 .view-log--controls {
@@ -80,6 +87,17 @@ body {
     font-family: var(--font--mono);
     font-size: 90%;
     background-color: var(--color--log-background);
+}
+
+/*
+*   Modifiers
+*/
+.text-good {
+    color: green;
+}
+
+.text-bad {
+    color: red;
 }
 
 /*

@@ -1,0 +1,12 @@
+<h2 class="text-good">App added successfully!</h2>
+
+<p>
+    <%- partial("_partials/app.ejs", { app_name: app_name, api_key: api_key }) %>
+</p>
+
+<p>
+    <h3>Options</h3>
+    <a href="/auth/app-list">View all authorized apps</a>
+    <a href="/">Go back home</a>
+    <a href="/apps/<%= app_name %>/view-log">View log</a>
+</p>

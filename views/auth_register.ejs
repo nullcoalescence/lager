@@ -1,17 +1,14 @@
 <h2>Register your app</h2>
 
 <p>
-    <p>
-        <label for="app-name--field">App name</label>
-        <br>
-        <input id="app-name--field" type="text" size="50">
-    </p>
-    <p>
-        <label for="app-description--field">App description</label>
-        <br>
-        <textarea id="app-description--field" rows="3" cols="50"></textarea>
-    </p>
-    <p>
-        <a href="javascript:submit()">Register</a>
-    </p>
+    <form action="/auth/register/validate" method="POST" >
+        <p>
+            <label for="appName">App name</label>
+            <br>
+            <input id="appName" name="appName" type="text" size="20">
+        </p>
+        <p>
+            <input type="submit" value="Register">
+        </p>
+    </form>
 </p>
