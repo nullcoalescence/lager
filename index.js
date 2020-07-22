@@ -48,7 +48,7 @@ if (process.env.environment == "dev") {
 }
 
 // Database
-var appDatabase = require(path.join(__dirname, "/database.js"));
+var appDB = require(path.join(__dirname, "/database.js"));
 
 // Directories
 var logDir = process.env.logDir || path.join(__dirname, "/logs/");
@@ -84,18 +84,30 @@ app.post("/auth/register/validate",
     check("appName").not().isEmpty().trim().escape().withMessage("'App name' field empty"),
     (req, res) => {
         var appName = req.body.appName;
+        appName = appName.replace(/ +/g, "-"); // Replace spaces with dashes
+        console.log(appName);
         var errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.render(path.join(__dirname, "/views/auth_register_error.ejs"), { errors: "Field 'App name' empty" });
+            res.render(path.join(__dirname, "/views/error.ejs"), { errors: "Field 'App name' empty" });
         } else {
-            appDatabase.addApp(req.body.appName);
-            var newApp = appDatabase.getApp(req.body.appName);
+
+            // Make sure we are not registering a duplicate app
+            var validApps = appDB.getAppList();
+            for (var i = 0; i < validApps.length; i++) {
+                if (validApps[i].app_name == appName) {
+                    res.render(path.join(__dirname, "/views/error.ejs"), { errors: "App with that name already exists" });
+                    return;
+                }
+            }
+
+            appDB.addApp(appName);
+            var newApp = appDB.getApp(appName);
 
             // Create log file
             var logFileName = logDir + "/" + newApp.app_name + ".log.txt";
 
             var fStream = fs.createWriteStream(logFileName);
-            fStream.write("[lager]: initialized app and created log!");
+            fStream.write("[lager]: initialized app and created log!\n");
             fStream.end();
 
             res.render(path.join(__dirname, "/views/auth_add_app_success.ejs"), { app_name: newApp.app_name, api_key: newApp.api_key });
@@ -105,65 +117,116 @@ app.post("/auth/register/validate",
 // GET /auth/app-list
 // Returns a JSON list of all registered apps
 app.get("/auth/app-list", (req, res) => {
-    var appList = appDatabase.getAppList();
+    var appList = appDB.getAppList();
+
+    if (appList.length == 0) {
+        res.render(path.join(__dirname, "/views/error.ejs"), { errors: "No apps registered in the database yet" });
+    }
+
     for (var i = 0; i < appList.length; i++) {
-        res.render(path.join(__dirname, "/views/_partials/app_list.ejs"), { app_list: appList });
+        res.render(path.join(__dirname, "/views/all_apps.ejs"), { app_list: appList });
     }
 });
 
-//  GET /auth/app
+// GET /auth/view-app
+// @todo
 // Returns a JSON object of the requested app
-app.get("/auth/app/:appName", (req, res) => {
-    var app = appDatabase.getApp(req.params.appName);
+app.get("/auth/view-app/", (req, res) => {
+    var app = appDB.getApp(req.params.appName);
     res.render(path.join(__dirname, "/views/_partials/app.ejs"), { app: app, app_name: app.app_name, api_key: app.api_key });
 });
 
 // GET /auth/wipe-db
 // Wipes database
 app.get("/auth/wipe-database", (req, res) => {
-    appDatabase.wipeDatabase();
+    appDB.wipeDatabase();
     res.render(path.join(__dirname, "/views/database_wiped.ejs"));
 });
 
-// POST /apps/:appname/write-log
-// Writes the log of a specified app
-// :appname - specified app
-// ?appName - name of (authenticated) app
-// ?logText - text to log
-app.post("/apps/:appName/write-log/", (req, res) => {
-    var appName = req.params.appName;
-    var logText = req.sanitize(req.query.logText); 
-    
-    // Input validation
-    // 1) Make sure appName is a valid registered app
-    if (appName) { 
-        // @todo 
+// GET /auth/revoke
+// UI for user to select app to remove from database
+app.get("/auth/revoke", (req, res) => {
+    var appList = appDB.getAppList();
+
+    if (appList.length == 0) {
+        res.render(path.join(__dirname, "/views/error.ejs"), { errors: "No apps registered in the database yet" });
     }
+
+    res.render(path.join(__dirname, "/views/_partials/app_list_with_buttons.ejs"), { app_list: appList, url: "/auth/revoke-app?app=", text: "Revoke" });
+});
+
+// GET /auth/revoke-app?app="appname"
+// Removes an app from database
+app.get("/auth/revoke-app", (req, res) => {
+    appDB.removeApp(req.query.app);
+    res.render(path.join(__dirname, "/views/removed_app.ejs"));
+});
+
+// GET /logs/view
+app.get("/logs/view", (req, res) => {
+    var appList = appDB.getAppList();
+
+    res.render(path.join(__dirname, "/views/_partials/app_list_with_buttons.ejs"), { app_list: appList, url: "/logs/view-log?app=", text: "View log" })
+});
+
+// POST /apps/write/?appName="appName"?text="Text"?auth="AuthKey"
+// Writes the log of a specified app
+// app - name of app registered in database
+// text - text to log
+// auth - auth key assigned in database
+app.post("/log/write", (req, res) => {
+    var appName = req.query.app;
+    var logText = req.sanitize(req.query.text); 
+    var authKey = req.query.auth;
     
-    var formattedLogEntry = "[" + appName + "]: " + logText;
+    if (!appDB.appExists(appName)) {
+        res.status(400).send("400 bad request: Invalid 'app' parameter - app does not exist")
+    }
+
+    
+    var formattedLogEntry = "[" + appName + "]: " + logText + "\n";
     
     // Open log
-    fs.writeFileSync(logDir + "/" + appName + ".log.txt");
+    fs.appendFileSync(logDir + "/" + appName + ".log.txt", formattedLogEntry, (err) => {
+        if (err) logger.error("Error writing to file\n" + err);
+        console.log("wrote to file");
+    });
 
     
     res.end();
 
 });
 
-// GET /apps/:appname/view-log
+// GET /logs/view-log?app="app"
 // Views log of an app
-// :appname - name of application to view logs
-app.get("/apps/:appName/view-log", (req, res) => {
-    res.render(path.join(__dirname, "/views/view_log.ejs"), { appName: req.params.appName });
+// ?app - name of app
+app.get("/logs/view-log", (req, res) => {
+    var appName = req.query.app;
+
+    if (!appDB.appExists(appName)) {
+        res.render(path.join(__dirname, "/views/error.ejs"), { errors: "App doesn't exist" });
+    }
+
+    res.render(path.join(__dirname, "/views/view_log.ejs"), { app_name: appName });
 });
 
-// GET /apps/:appName/get-log
+// GET /log/get-log?app="App-name"
 // Returns actual log file
-// Used to export logs for user and for jQuery get() requests in view_log.js
-app.get("/apps/:appName/get-log", (req, res) => {
-    res.sendFile(logDir + "/" + req.params.appName + ".log.txt");
-    res.sendFile(logDir + req.params.appName + ".log.txt");
+// app - name of app
+app.get("/log/get-log", (req, res) => {
+    var appName = req.query.app;
+
+    if (!appDB.appExists(appName)) {
+        res.status(400).send("400 bad request: Invalid 'name' parameter - app does not exist");
+    }
+
+    res.sendFile(logDir + "/" + appName + ".log.txt");
 });
+
+// 404 file not found
+app.use((req, res) => {
+    res.status("404").render(path.join(__dirname, "/views/404_error.ejs"));
+})
 
 /*
 *   Start express

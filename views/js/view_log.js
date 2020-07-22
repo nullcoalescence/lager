@@ -13,12 +13,12 @@ window.onload = () => {
     appName = $(".appName").html();
 
     // Render log from file
-    $.get("/apps/" + appName + "/get-log", (data) => {
+    $.get("/log/get-log?app=" + appName, (data) => {
         data = data.replace(/\n/g, "<br>"); // Replace newlines with <br>
         $(".log-content").html(data);
     });
 }
 
 function exportFile() {
-    window.open("/apps/"+ appName + "/get-log");
+    window.open("/log/get-log?app="+ appName);
 }

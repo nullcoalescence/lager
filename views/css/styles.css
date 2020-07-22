@@ -62,6 +62,7 @@ body {
 
 .page-content code {
     padding: 3px;
+    line-height: 1.6;
     background-color: var(--color--log-background);
     font-family: var(--font--mono);
 }

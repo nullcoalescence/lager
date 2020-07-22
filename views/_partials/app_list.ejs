@@ -1,4 +1,3 @@
-<h2>Apps</h2>
 <ul>
     <% for (app in app_list) { %>
         <li><%- partial("_partials/app.ejs", { app_name: app_list[app].app_name, api_key: app_list[app].api_key }) %></li>

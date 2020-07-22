@@ -7,11 +7,12 @@
 var path = require("path");
 var fs = require("fs");
 const { json } = require("express");
+const { data } = require("jquery");
 
 require("dotenv").config();
 
 // App database
-var appDB = path.join(__dirname, "/authorized_apps_db.json");
+var database = path.join(__dirname, "/authorized_apps_db.json");
 
 /*
 *   Adds an app to the database
@@ -21,7 +22,7 @@ function addApp(appName) {
     var apiKey = generateKey();
 
     // Read database
-    var raw = fs.readFileSync(appDB);
+    var raw = fs.readFileSync(database);
     var jsonData = JSON.parse(raw);
 
     // Add new data
@@ -29,7 +30,7 @@ function addApp(appName) {
 
     // Write to database
     var newData = JSON.stringify(jsonData);
-    fs.writeFileSync(appDB, newData);
+    fs.writeFileSync(database, newData);
 }
 
 /*
@@ -49,6 +50,18 @@ function getApp(appName) {
 *   Removes an app from the database
 */
 function removeApp(appName) {
+    // Read database
+    var jsonData = JSON.parse(fs.readFileSync(database));
+    
+    // Read through data to file our app
+    for (var i = 0; i < jsonData.authorized_apps.length; i++) {
+        if (jsonData.authorized_apps[i].app_name == appName) {
+            jsonData.authorized_apps.splice(i, 1);
+        }
+    }
+
+    // Write to database
+    fs.writeFileSync(database, JSON.stringify(jsonData));
 }
 
 /*
@@ -57,7 +70,7 @@ function removeApp(appName) {
 */
 function getAppList() {
     // Read database
-    var raw = fs.readFileSync(appDB);
+    var raw = fs.readFileSync(database);
     var jsonData = JSON.parse(raw);
     return jsonData.authorized_apps;
 }
@@ -67,16 +80,26 @@ function getAppList() {
 */
 function wipeDatabase() {
     // Read database
-    var raw = fs.readFileSync(appDB);
-    var jsonData = JSON.parse(raw);
+    var jsonData = JSON.parse(fs.readFileSync(database));
 
-        // Add new data
-        jsonData.authorized_apps = []; // Clear
+    // Add new data
+    jsonData.authorized_apps = []; // Clear
 
-        // Write to database
-        var newData = JSON.stringify(jsonData);
-        fs.writeFileSync(appDB, newData);
+    // Write to database
+    fs.writeFileSync(database, JSON.stringify(jsonData));
+}
 
+/*
+*   Checks if app exists in the database
+*/
+function appExists(appName) {
+    var apps = getAppList();
+    for (var i = 0; i < apps.length; i++) {
+        if (apps[i].app_name == appName) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // ====================================================================================
@@ -99,5 +122,6 @@ module.exports = {
     getApp,
     removeApp,
     getAppList,
-    wipeDatabase
+    wipeDatabase,
+    appExists
 }

@@ -5,8 +5,12 @@
 </p>
 
 <p>
+    To write to it's log, send a POST to <code>http://<script>document.write(location.hostname)</script>/log/write-log?app="<%= app_name %>"&text="My message"&key="<%= api_key %>"</code>
+</p>
+
+<p>
     <h3>Options</h3>
     <a href="/auth/app-list">View all authorized apps</a>
     <a href="/">Go back home</a>
-    <a href="/apps/<%= app_name %>/view-log">View log</a>
+    <a href="/logs/view-log?app=<%= app_name %>">View log</a>
 </p>

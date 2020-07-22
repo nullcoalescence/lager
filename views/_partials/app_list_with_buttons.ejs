@@ -1,0 +1,10 @@
+<h2><%= text %></h2>
+<ul>
+    <% for (app in app_list) { %>
+        <li>
+            <%- partial("_partials/app.ejs", { app_name: app_list[app].app_name, api_key: app_list[app].api_key }) %>
+
+            <a href="<%= url %><%= app_list[app].app_name %>"><%= text %></a>
+        </li>
+    <% } %>
+</ul>

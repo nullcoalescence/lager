@@ -1,22 +1,21 @@
 <h2>Authorize apps</h2>
 <p>
-    In order to connect your app to lager, you have to configure it here. Lager will then give you an auth token, which you will append to your http requests to lager, like so 
-    <code>?auth=AUTH_CODE</code>.
+    In order to connect your app to lager, you have to configure it here. lager will then assign your app, a key,
+    which you will append to your http requests to lager, like so 
+    <code>?auth="auth_key"</code>.
 </p>
 <p>
     <ul>
         <li><a href="/auth/register">Register your app</a></li>
         <li><a href="/auth/app-list">View currently registered apps and their corresponding api keys</a></li>
         <li><a href="/auth/revoke">Revoke access to an app</a></li>
-    </ul>
-    <ul>
         <li>
             <a href="javascript:toggleConfirm()">Wipe database</a>
             <ul>
                 <li id="wipe-database-confirmation">Wipe database? <a href="/auth/wipe-database">Yes</a><a href="javascript:toggleConfirm()">No</a></li>
             </ul>
         </li>
-    </ul>
+    </ul>   
 
     <script>
         var confirmOpen = false;
