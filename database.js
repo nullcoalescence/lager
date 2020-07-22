@@ -20,6 +20,7 @@ var database = path.join(__dirname, "/authorized_apps_db.json");
 function addApp(appName) {
     // Generate API key
     var apiKey = generateKey();
+    console.log(apiKey);
 
     // Read database
     var raw = fs.readFileSync(database);
@@ -111,7 +112,7 @@ function appExists(appName) {
 *   This key is used in API requests to lager to verify app
 */
 function generateKey() {
-    return "API_KEY";
+    return Math.floor(Math.random() * 1000);
 }
 
 /*

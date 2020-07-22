@@ -11,8 +11,6 @@ var fs = require("fs");
 
 require("dotenv").config();
 
-var axios = require("axios");
-
 // Express
 var express = require("express");
 var app = express();
