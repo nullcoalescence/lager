@@ -3,7 +3,7 @@
 
 ## Installation
 (this guide assumes you are installing this on a linux server on your local network, like a raspberry pi or something. You should have a webserver installed, like nginx. You can also run it locally if you'd like.
-'''
+```
 $ git clone https://github.com/bendotbike/lager.git /var/apps/lager
 $ cd /var/apps/lager
 $ npm install
