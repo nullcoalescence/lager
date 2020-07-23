@@ -1,0 +1,27 @@
+/*
+*   bootstrap-styles.css
+*   Styles to use when using bootstrap
+*/
+
+.page-content {
+    margin: 20px;
+}
+
+.page-content code {
+    background-color: #CDCDCD;
+    padding: 3px;
+}
+
+.view-log--container {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.hidden-meta {
+    display: none;
+}
+
+.view-log--log-container {
+    display: block;
+    width: 100%;
+}

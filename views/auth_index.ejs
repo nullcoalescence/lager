@@ -1,34 +1,60 @@
 <h2>Authorize apps</h2>
 <p>
-    In order to connect your app to lager, you have to configure it here. lager will then assign your app, a key,
+    In order to connect your app to lager, you have to configure it here. lager will then assign your app a key,
     which you will append to your http requests to lager, like so 
-    <code>?auth="auth_key"</code>.
+    <code>?auth="key"</code>.
 </p>
-<p>
-    <ul>
-        <li><a href="/auth/register">Register your app</a></li>
-        <li><a href="/auth/app-list">View currently registered apps and their corresponding api keys</a></li>
-        <li><a href="/auth/revoke">Revoke access to an app</a></li>
-        <li>
-            <a href="javascript:toggleConfirm()">Wipe database</a>
-            <ul>
-                <li id="wipe-database-confirmation">Wipe database? <a href="/auth/wipe-database">Yes</a><a href="javascript:toggleConfirm()">No</a></li>
-            </ul>
-        </li>
-    </ul>   
 
-    <script>
-        var confirmOpen = false;
-        function toggleConfirm() {
-            if (confirmOpen) {
-                $("#wipe-database-confirmation").hide();
-                confirmOpen = false;
-            } else {
-                $("#wipe-database-confirmation").show();
-                confirmOpen = true;
-            }
+<div class="list-group">
+    <a href="/auth/register" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">Register your app</h5>
+        </div>
+        <p class="mb-1">
+            Add your app to lager and get an auth key
+        </p>
+    </a>
+    <a href="/auth/app-list" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">View currently registered apps and their corresponding auth keys</h5>
+        </div>
+        <p class="mb-1">
+            Look at all your apps you've added
+        </p>
+    </a>
+    <a href="/auth/revoke" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">Revoke access to an app</h5>
+        </div>
+        <p class="mb-1">
+            Remove an app's authorization to send logs to lager. <strong>This will remove your log files!</strong>
+        </p>
+    </a>
+    <a href="javascript:toggleConfirm()" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">Wipe database</h5>
+        </div>
+        <p class="mb-1">
+            Wipe database of all registered apps. <strong>This will remove all your log files!</strong>
+        </p>
+    </a>
+
+    <div id="wipe-database-confirmation" style="display: none; padding: 20px;">
+        Wipe database?
+        <a href="/auth/wipe-database" class="btn btn-success">Yes</a>
+        <a href="javascript:toggleConfirm()" class="btn btn-danger">No</a>
+    </div>
+</div>
+
+<script>
+    var confirmOpen = false;
+    function toggleConfirm() {
+        if (confirmOpen) {
+            $("#wipe-database-confirmation").hide();
+            confirmOpen = false;
+        } else {
+            $("#wipe-database-confirmation").show();
+            confirmOpen = true;
         }
-
-    </script>
-
-</p>
+    }
+</script>

@@ -1,14 +1,11 @@
 <h2>Register your app</h2>
 
-<p>
-    <form action="/auth/register/validate" method="POST" >
+<div class="form-group">
+    <form action="/auth/register/validate" method="POST">
+        <label class="col-form-label" for="appName">App name</label>
         <p>
-            <label for="appName">App name</label>
-            <br>
-            <input id="appName" name="appName" type="text" size="20">
+            <input type="text" class="form-control" name="appName" id="appName">
         </p>
-        <p>
-            <input type="submit" value="Register">
-        </p>
+        <input type="submit" class="btn btn-primary" value="Register app">
     </form>
-</p>
+</div>

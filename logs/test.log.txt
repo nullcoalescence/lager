@@ -1,1 +1,12 @@
 [lager]: initialized app and created log!
+[test]: undefined
+[test]: undefined
+[test]: undefined
+[test]: undefined
+[test]: undefined
+[test]: undefined
+[test]: undefined
+[test]: undefined
+[test]: undefined
+[test]: undefined
+[test]: undefined

@@ -126,11 +126,11 @@ app.get("/auth/app-list", (req, res) => {
     }
 });
 
-// GET /auth/view-app
+// GET /auth/view-app?app=
 // @todo
 // Returns a JSON object of the requested app
 app.get("/auth/view-app/", (req, res) => {
-    var app = appDB.getApp(req.params.appName);
+    var app = appDB.getApp(req.query.app);
     res.render(path.join(__dirname, "/views/_partials/app.ejs"), { app: app, app_name: app.app_name, api_key: app.api_key });
 });
 
@@ -157,40 +157,47 @@ app.get("/auth/revoke", (req, res) => {
 // Removes an app from database
 app.get("/auth/revoke-app", (req, res) => {
     appDB.removeApp(req.query.app);
-    res.render(path.join(__dirname, "/views/removed_app.ejs"));
+    res.render(path.join(__dirname, "/views/app_removed.ejs"));
 });
 
 // GET /logs/view
 app.get("/logs/view", (req, res) => {
     var appList = appDB.getAppList();
 
+    if (appList == 0) {
+        res.render(path.join(__dirname, "/views/error.ejs"), { errors: "No apps registered in the database yet" });
+    }
+
     res.render(path.join(__dirname, "/views/_partials/app_list_with_buttons.ejs"), { app_list: appList, url: "/logs/view-log?app=", text: "View log" })
 });
 
-// POST /apps/write/?appName="appName"?text="Text"?auth="AuthKey"
+// POST /log/write/?appName="appName"?text="Text"?auth="AuthKey"
 // Writes the log of a specified app
 // app - name of app registered in database
 // text - text to log
 // auth - auth key assigned in database
 app.post("/log/write", (req, res) => {
     var appName = req.query.app;
-    var logText = req.sanitize(req.query.text); 
-    var authKey = req.query.auth;
     
     if (!appDB.appExists(appName)) {
         res.status(400).send("400 bad request: Invalid 'app' parameter - app does not exist")
     }
 
+    //if (!appDB.validAuthKey(appName, appDB.getApp(appName).api_key)) {
+    //    res.status(400).send("400 bad request: Invalid auth key provided for app");
+    //}
+
+    var logText = req.sanitize(req.query[text]); 
+    var authKey = req.query.auth;
     
     var formattedLogEntry = "[" + appName + "]: " + logText + "\n";
     
     // Open log
     fs.appendFileSync(logDir + "/" + appName + ".log.txt", formattedLogEntry, (err) => {
         if (err) logger.error("Error writing to file\n" + err);
-        console.log("wrote to file");
     });
 
-    
+    //res.status(200).send().end();
     res.end();
 
 });

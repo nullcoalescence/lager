@@ -11,6 +11,8 @@ const { data } = require("jquery");
 
 require("dotenv").config();
 
+var logDir = process.env.logDir || path.join(__dirname, "/logs/");
+
 // App database
 var database = path.join(__dirname, "/authorized_apps_db.json");
 
@@ -51,6 +53,9 @@ function getApp(appName) {
 *   Removes an app from the database
 */
 function removeApp(appName) {
+    // Remove log file
+    fs.unlinkSync(logDir + appName + ".log.txt");
+
     // Read database
     var jsonData = JSON.parse(fs.readFileSync(database));
     
@@ -80,6 +85,17 @@ function getAppList() {
 *   Wipes all items from database
 */
 function wipeDatabase() {
+    // Iterate through log directory and delete all of them
+    fs.readdirSync(logDir, (err, files) => {
+        if (err) throw err;
+
+        for (var file of files) {
+            fs.unlinkSync(path.join(logDir, file), err => {
+                if (err) throw err;
+            });
+        }
+    })
+
     // Read database
     var jsonData = JSON.parse(fs.readFileSync(database));
 
@@ -103,6 +119,18 @@ function appExists(appName) {
     return false;
 }
 
+function validAuthKey(appName, authKey) {
+    var apps = getAppList();
+    for (var i = 0; i < apps.length; i++) {
+        if (apps[i].app_name == appName) {
+            if (apps[i].api_key == authKey) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 // ====================================================================================
 // Non-exported functions
 // ====================================================================================
@@ -113,7 +141,7 @@ function appExists(appName) {
 */
 function generateKey() {
     return Math.floor(Math.random() * 1000);
-}
+} 
 
 /*
 *   Exports
@@ -124,5 +152,6 @@ module.exports = {
     removeApp,
     getAppList,
     wipeDatabase,
-    appExists
+    appExists,
+    validAuthKey
 }

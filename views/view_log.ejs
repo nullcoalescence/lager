@@ -1,10 +1,11 @@
-<h2><%= app_name %>: view logs</h2>
-<div class="view-log--controls">
-    <a href="javascript:location.reload()">Refresh</a>
-    <a href="javascript:exportFile()">Export file</a>
+<h2><%= app_name %>: Log</h2>
+
+<div class="view-log--controls view-log--container">
+    <a class="btn btn-primary btn-lg" href="javascript:location.reload();">Refresh</a>
+    <a class="btn btn-primary btn-lg" href="javascript:exportFile();">Export file</a>
 </div>
 
-<div class="log-container">
+<div class="view-log--log-container view-log--container">
     <code class="log-content"></code>
 </div>
 

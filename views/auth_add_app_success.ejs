@@ -5,12 +5,12 @@
 </p>
 
 <p>
-    To write to it's log, send a POST to <code>http://<script>document.write(location.hostname)</script>/log/write-log?app="<%= app_name %>"&text="My message"&key="<%= api_key %>"</code>
+    To write to it's log, send a POST to <code><span class="url"></span>/log/write?app="<%= app_name %>"&text="My message"&key="<%= api_key %>"</code>
 </p>
 
 <p>
     <h3>Options</h3>
-    <a href="/auth/app-list">View all authorized apps</a>
-    <a href="/">Go back home</a>
-    <a href="/logs/view-log?app=<%= app_name %>">View log</a>
+    <a class="btn btn-success" href="/logs/view-log?app=<%= app_name %>">View log</a>
+    <a class="btn btn-secondary" href="/auth/app-list">View all authorized apps</a>
+    <a class="btn btn-info" href="/">Go back home</a>
 </p>
